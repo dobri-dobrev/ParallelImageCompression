@@ -1,4 +1,5 @@
 Ways to compress:
 1st version convert numbers to hex
 2nd version aggreagate repeats in decimal
-3rd version turn to hex and aggregate repeats
+3rd version turn to hex and aggregate repeats with a lot of asyncs
+4th version split to as many asyncs as cores*2 to accelerate
