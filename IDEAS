@@ -1,0 +1,4 @@
+Ways to compress:
+1st version convert numbers to hex
+2nd version aggreagate repeats in decimal
+3rd version turn to hex and aggregate repeats
