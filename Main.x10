@@ -9,116 +9,33 @@ import x10.array.Array_2;
 
 public class Main{
 	public static def main(args:Rail[String]) {
-        var F:File;
+       
         if(args.size!=1) {
         	Console.ERR.println(args(0) + " is not a valid file");
         	throw new IllegalArgumentException(args(0) + " is not a valid file");
         }
-        val filename = args(0);
-        F  = new File(filename);
-        var m:Rail[Rail[Pixel]] = readInMatrix(F);
-        //printMatrix(m);
-        matrixToFile(m, "sampleOut.ppt");
-        Console.OUT.println(areAllZero(m));
-
-    }
-
-    public static def readInMatrix(f:File):Rail[Rail[Pixel]]{
-    	var matrix: Rail[Rail[Pixel]];
-    	var itr:ReaderIterator[String] = f.lines();
-    	var t:String = itr.next();
-    	t = itr.next();
-    	val v = t.split(" ");
-    	val width = Long.parse(v(0).trim());
-    	val height = Long.parse(v(1).trim());
-        var curWidth: Long = 0;
-        var curHeight: Long = 0;
-        var counter: Long = 0;
-        Console.OUT.println("width "+width+" height "+height);
-        t = itr.next();
-        matrix = new Rail[Rail[Pixel]](height);
-        matrix(0) = new Rail[Pixel](width);
-        var red:Long =0;
-        var green: Long = 0;
-        var blue: Long = 0;
+        val sourceFilename = args(0);
+        var sourceFile: File = new File(sourceFilename);
+        for (line in sourceFile.lines()){
+            executeOne(line.trim());
+            Console.OUT.println("Done with "+line);
+        }
         
-        while(itr.hasNext()){
-            t = itr.next();
-            
-            //Console.OUT.println("row number "+tempRowCount);
-            
-            //Console.OUT.println("Row is "+ t);
-            val row = t.split(" ");
-            
-            for(var i:Long = 0; i< row.size; i++){
-                if(row(i).length()==0n){
+        //printMatrix(m);
+       
+        
 
-                }
-                else{
-                    //Console.OUT.println(row(i).length());
-                    if(curWidth == width){
-                        curWidth = 0;
-                        curHeight+=1;
-                        //Console.OUT.println(row(i)+ " new row, left " +(row.size-i) );
-                        matrix(curHeight) = new Rail[Pixel](width);
+    }
+    public static def executeOne(filename: String){
+        var m:Rail[Rail[Pixel]] = ImageProcessing.readInMatrix(filename);
+        m = ImageProcessing.horizontalBlur(m, 10);
+        m = ImageProcessing.verticalBlur(m, 10);
+        m = ImageProcessing.redFilter(m);
+        ImageProcessing.matrixToFile(m, "OUT"+filename);
+    }
+
     
-                    }
-                    if(counter ==2){
-                        
-                        
-                        counter = -1;
-                        blue = Long.parse(row(i).trim());
-                        //Console.OUT.println(curHeight+ " "+ curWidth + " "+tempPixel.toString());
-                        matrix(curHeight)(curWidth) = new Pixel(red, green, blue);
-
-                        curWidth+=1;
-                    }
-                    if( counter ==1){
-                        green = Long.parse(row(i).trim());
-                    }
-                    if(counter == 0){
-                        
-                        red = Long.parse(row(i).trim());
-                    }
-                    counter+=1;
-                }
-
-            }
-
-        }
-        return matrix;
-
-    }
-    public static def matrixToFile(m: Rail[Rail[Pixel]], fileName: String){
-        val F = new File(fileName);
-        val printer = F.printer();
-        printer.println("P3");
-        printer.println(m(0).size+ " "+ m.size);
-        printer.println("255");
-        var curHeight: Long = 0;
-        var curWidth: Long = 0;
-        var curLineCounter: Long = 0;
-        var tempLineString: String = "";
-        while(curHeight< m.size){
-            if(curLineCounter== 5){
-                printer.println(tempLineString);
-                tempLineString="";
-                curLineCounter=0;
-            }
-            if(curWidth== m(curHeight).size){
-                curHeight++;
-                curWidth = 0;
-            }
-            if(curHeight< m.size){
-                tempLineString+= m(curHeight)(curWidth).print();
-                curWidth++;
-                curLineCounter++;
-            }
-
-        }
-        printer.flush();
-
-    }
+    
 
 
     public static def printMatrix( m: Rail[Rail[Pixel]]){

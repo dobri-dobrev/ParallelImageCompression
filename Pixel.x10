@@ -13,6 +13,12 @@ public class Pixel{
 		// b = 0;
 
 	}
+	def add(p:Pixel):Pixel{
+		return new Pixel(this.r+p.r, this.g+p.g, this.b+p.b);
+	}
+	def divide(divider: Long):Pixel{
+		return new Pixel(this.r/divider, this.g/divider, this.b/divider);
+	}
 
 	public def print():String{
 		var out:String = "";
