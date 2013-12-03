@@ -143,7 +143,7 @@ public class ImageProcessing{
 		return outM;
 	}
 	public static def matrixToFile(m: Rail[Rail[Pixel]], fileName: String){
-        val F = new File(fileName);
+        val F = new File("OUT"+fileName);
         val printer = F.printer();
         printer.println("P3");
         printer.println(m(0).size+ " "+ m.size);

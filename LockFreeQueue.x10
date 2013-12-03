@@ -1,7 +1,7 @@
 import x10.util.concurrent.AtomicReference;
 
 public class LockFreeQueue{
-	private static type Data = Rail[Rail[Pixel]];
+	private static type Data = ImageWrapper;
 
 	private static class Node{
 		var data:Data = null;
@@ -55,7 +55,7 @@ public class LockFreeQueue{
 			else
 				if( head.compareAndSet(h ,n )) break;
 		} while (true);
-		
+
 		d = n.data;
 		n.data = null;
 		h.next = null;

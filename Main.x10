@@ -31,7 +31,7 @@ public class Main{
         m = ImageProcessing.horizontalBlur(m, 10);
         m = ImageProcessing.verticalBlur(m, 10);
         m = ImageProcessing.redFilter(m);
-        ImageProcessing.matrixToFile(m, "OUT"+filename);
+        ImageProcessing.matrixToFile(m, filename);
     }
 
     
