@@ -1,8 +1,8 @@
 import x10.util.concurrent.AtomicReference;
 
-public class LockFreeQueue{
-	private static type Data = Rail[Rail[Pixel]];
-
+public class LockFreeQueueString{
+	private static type Data = String;
+	public var maxSize: Long = 0;
 	private static class Node{
 		var data:Data = null;
 		var next: AtomicReference[Node] = AtomicReference.newAtomicReference[Node](null);
@@ -37,6 +37,7 @@ public class LockFreeQueue{
 
 		}while (true);
 		tail.compareAndSet(t,d);
+		maxSize++;
 	}
 	public def dequeue():Data{
 		var d:Data = null;
@@ -55,7 +56,7 @@ public class LockFreeQueue{
 			else
 				if( head.compareAndSet(h ,n )) break;
 		} while (true);
-		
+
 		d = n.data;
 		n.data = null;
 		h.next = null;

@@ -9,7 +9,7 @@ import x10.array.Array_2;
 
 public class Main{
 	public static def main(args:Rail[String]) {
-       
+        
         if(args.size!=1) {
         	Console.ERR.println(args(0) + " is not a valid file");
         	throw new IllegalArgumentException(args(0) + " is not a valid file");

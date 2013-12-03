@@ -1,6 +1,7 @@
 import x10.io.ReaderIterator;
 import x10.io.File;
 import x10.io.Printer;
+
 //inspired by http://www.blackpawn.com/texts/blur/
 public class ImageProcessing{
 	public static def readInMatrix(filename: String):Rail[Rail[Pixel]]{
