@@ -1,12 +1,14 @@
+import x10.util.concurrent.AtomicLong;
+
 public class CounterWrapper{
-	private var count: Long;
+	private var count: AtomicLong;
 	public def this(){
-		count = 0;
+		count = new AtomicLong(0);
 	}
 	public def increment(){
-		count++;
+		count.incrementAndGet();
 	}
 	public def get(): Long{
-		return count;
+		return count.get();
 	}
 }

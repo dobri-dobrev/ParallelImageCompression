@@ -1,2 +1,10 @@
-sample.ppm
-sample2.ppm
+dilbert.ppm
+aliens.ppm
+game.ppm
+homer.ppm
+intelInside.ppm
+simpsonsBrain.ppm
+simpsonsGirl.ppm
+sleep.ppm
+t&j.ppm
+t&j2.ppm

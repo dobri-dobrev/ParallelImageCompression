@@ -30,7 +30,7 @@ public class StreamWrapper{
         var FilterToWrite: LockFreeQueue = new LockFreeQueue();
         for (line in sourceFile.lines()){
             readQueue.enqueue(line);
-            Console.OUT.println("pushed "+line);
+            //Console.OUT.println("pushed "+line);
         }
         val nFiles = readQueue.maxSize;
         finish{
@@ -58,11 +58,11 @@ public class StreamWrapper{
     		val fileName = inqueue.dequeue();
     		
     		if(fileName != null){
-    			Console.OUT.println(fileName);
+    			//Console.OUT.println(fileName);
     			val m = ImageProcessing.readInMatrix(fileName);
     			val img = new ImageWrapper(fileName, m);
     			outqueue.enqueue(img);
-    			Console.OUT.println("processed "+fileName);
+    			Console.OUT.println("read in "+fileName);
     			readCounter.increment();
     		}
     	}
@@ -81,7 +81,7 @@ public class StreamWrapper{
     		val mIN = inqueue.dequeue();
     		
     		if(mIN != null){
-    			Console.OUT.println("begin horizontal Blur");
+    			//Console.OUT.println("begin horizontal Blur");
     			val m = ImageProcessing.horizontalBlur(mIN.getImage(), blurAmmount);
     			val img = new ImageWrapper(mIN.getFilename(), m);
     			outqueue.enqueue(img);
@@ -106,7 +106,7 @@ public class StreamWrapper{
     		val mIN = inqueue.dequeue();
     		
     		if(mIN != null){
-    			Console.OUT.println("begin vertical Blur");
+    			//Console.OUT.println("begin vertical Blur");
     			val m = ImageProcessing.verticalBlur(mIN.getImage(), blurAmmount);
     			val img = new ImageWrapper(mIN.getFilename(), m);
     			outqueue.enqueue(img);
@@ -130,7 +130,7 @@ public class StreamWrapper{
     		val mIN = inqueue.dequeue();
     		
     		if(mIN != null){
-    			Console.OUT.println("begin filter");
+    			//Console.OUT.println("begin filter");
     			val m = ImageProcessing.redFilter(mIN.getImage());
     			val img = new ImageWrapper(mIN.getFilename(), m);
     			outqueue.enqueue(img);
@@ -156,8 +156,13 @@ public class StreamWrapper{
     		if(mIN != null){
     			Console.OUT.println("begin writing");
 				ImageProcessing.matrixToFile(mIN.getImage(), mIN.getFilename());
-    			Console.OUT.println("wrote a file");
+    			Console.OUT.println("wrote "+mIN.getFilename());
     			writerCounter.increment();
+    			// Console.OUT.println("readCounter is "+ readCounter.get());
+    			// Console.OUT.println("hbCounter is "+ hbCounter.get());
+    			// Console.OUT.println("vbCounter is "+ vbCounter.get());
+    			// Console.OUT.println("filterCounter is "+ filterCounter.get());
+    			// Console.OUT.println("writerCounter is "+ writerCounter.get());
     		}
     	}
 
