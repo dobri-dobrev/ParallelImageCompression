@@ -22,6 +22,7 @@ public class LockFreeQueue{
 
 	}
 	public def enqueue(data: Data){
+		//Console.OUT.println("start enqueue");
 		var d: Node = new Node(data, null);
 		var t: Node = null;
 		var n: Node = null;
@@ -37,8 +38,10 @@ public class LockFreeQueue{
 
 		}while (true);
 		tail.compareAndSet(t,d);
+		//Console.OUT.println("end enqueue");
 	}
 	public def dequeue():Data{
+		//Console.OUT.println("start dequeue");
 		var d:Data = null;
 		var h:Node = null;
 		var t:Node = null;
@@ -48,8 +51,11 @@ public class LockFreeQueue{
 			t = tail.get();
 			n = h.next.get() ;
 			if ( head.get() != h) continue ;
-			if ( n == null )
+			if ( n == null ){
+				//Console.OUT.println("end enqueue");
 				return null;
+			}
+				
 			if( t == h )
 				tail.compareAndSet(t,n);
 			else
@@ -59,6 +65,7 @@ public class LockFreeQueue{
 		d = n.data;
 		n.data = null;
 		h.next = null;
+		//Console.OUT.println("end enqueue");
 		return d;
 	}
 }

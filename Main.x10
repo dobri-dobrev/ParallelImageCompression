@@ -6,6 +6,7 @@ import x10.io.FileNotFoundException;
 import x10.array.Array;
 import x10.util.ArrayList;
 import x10.array.Array_2;
+import x10.util.Timer;
 
 public class Main{
 	public static def main(args:Rail[String]) {
@@ -14,13 +15,16 @@ public class Main{
         	Console.ERR.println(args(0) + " is not a valid file");
         	throw new IllegalArgumentException(args(0) + " is not a valid file");
         }
+        val start = Timer.milliTime();
         val sourceFilename = args(0);
         var sourceFile: File = new File(sourceFilename);
         for (line in sourceFile.lines()){
             executeOne(line.trim());
             Console.OUT.println("Done with "+line);
         }
-        
+        val end = Timer.milliTime();
+        val time = end - start;
+        Console.OUT.println("Execution time was "+ time);
         //printMatrix(m);
        
         

@@ -16,7 +16,7 @@ public class ImageProcessing{
 	    var curWidth: Long = 0;
 	    var curHeight: Long = 0;
 	    var counter: Long = 0;
-	    Console.OUT.println("width "+width+" height "+height);
+
 	    t = itr.next();
 	    matrix = new Rail[Rail[Pixel]](height);
 	    matrix(0) = new Rail[Pixel](width);

@@ -6,6 +6,9 @@ import x10.io.FileNotFoundException;
 import x10.array.Array;
 import x10.util.ArrayList;
 import x10.array.Array_2;
+import x10.util.concurrent.AtomicLong;
+import x10.util.Timer;
+import x10.lang.System;
 
 public class StreamWrapper{
 	public var readCounter: CounterWrapper;
@@ -13,6 +16,12 @@ public class StreamWrapper{
 	public var vbCounter: CounterWrapper;
 	public var filterCounter: CounterWrapper;
 	public var writerCounter: CounterWrapper;
+    public var readTime:  AtomicLong = new AtomicLong(0);
+    public var hbTime: AtomicLong = new AtomicLong(0);
+    public var vbTime: AtomicLong = new AtomicLong(0);
+    public var filterTime: AtomicLong = new AtomicLong(0);
+    public var writeTime: AtomicLong = new AtomicLong(0);
+    public var SLEEP_TIME: Long;
 	public def this(){
 		readCounter = new CounterWrapper();
 		hbCounter = new CounterWrapper();
@@ -21,26 +30,32 @@ public class StreamWrapper{
 		writerCounter = new CounterWrapper();
 	}
 
-	public def exec(sourceFilename: String){
+	public def exec(sourceFilename: String, readThreads: Long, hbThreads: Long, vbThreads: Long, filterThreads: Long, writeThreads: Long, sleepTime: Long){
 		var sourceFile: File = new File(sourceFilename);
         var readQueue: LockFreeQueueString = new LockFreeQueueString();
         var readToHB: LockFreeQueue = new LockFreeQueue();
         var HBtoVB: LockFreeQueue = new LockFreeQueue();
         var VBtoFilter: LockFreeQueue = new LockFreeQueue();
         var FilterToWrite: LockFreeQueue = new LockFreeQueue();
+        SLEEP_TIME = sleepTime;
         for (line in sourceFile.lines()){
             readQueue.enqueue(line);
             //Console.OUT.println("pushed "+line);
         }
         val nFiles = readQueue.maxSize;
         finish{
-        	async this.readInFiles(3, readQueue, readToHB, nFiles);	
-        	async this.horizontalBlur(2, readToHB, HBtoVB, nFiles, 9);
-        	async this.verticalBlur(2, HBtoVB, VBtoFilter, nFiles, 9);
-        	async this.filter(2, VBtoFilter, FilterToWrite, nFiles);
-        	async this.write(2, FilterToWrite, nFiles);
+        	async this.readInFiles(readThreads, readQueue, readToHB, nFiles);	
+        	async this.horizontalBlur(hbThreads, readToHB, HBtoVB, nFiles, 9);
+        	async this.verticalBlur(vbThreads, HBtoVB, VBtoFilter, nFiles, 9);
+        	async this.filter(filterThreads, VBtoFilter, FilterToWrite, nFiles);
+        	async this.write(writeThreads, FilterToWrite, nFiles);
         	
         }
+        // Console.OUT.println("Read time was "+ readTime);
+        // Console.OUT.println("horizontal blut time was "+ hbTime);
+        // Console.OUT.println("vertical blur time was "+ vbTime);
+        // Console.OUT.println("filter time was "+ filterTime);
+        // Console.OUT.println("write time was "+ writeTime);
         
 
 	}
@@ -59,12 +74,18 @@ public class StreamWrapper{
     		
     		if(fileName != null){
     			//Console.OUT.println(fileName);
+                // val start = Timer.milliTime();
     			val m = ImageProcessing.readInMatrix(fileName);
     			val img = new ImageWrapper(fileName, m);
     			outqueue.enqueue(img);
-    			Console.OUT.println("read in "+fileName);
+    			// Console.OUT.println("read in "+fileName);
     			readCounter.increment();
+                // val end = Timer.milliTime();
+                // readTime.set(readTime.get()+end-start);
     		}
+            else{
+                System.threadSleep(SLEEP_TIME);
+            }
     	}
     }
     public def horizontalBlur(nthr: Long, inqueue: LockFreeQueue, outqueue: LockFreeQueue, toBlur: Long, blurAmmount: Long){
@@ -82,12 +103,18 @@ public class StreamWrapper{
     		
     		if(mIN != null){
     			//Console.OUT.println("begin horizontal Blur");
+                // val start = Timer.milliTime();
     			val m = ImageProcessing.horizontalBlur(mIN.getImage(), blurAmmount);
     			val img = new ImageWrapper(mIN.getFilename(), m);
     			outqueue.enqueue(img);
-    			Console.OUT.println("horizontal blurred a matrix");
+    			// Console.OUT.println("horizontal blurred a matrix");
     			hbCounter.increment();
+                // val end = Timer.milliTime();
+                // hbTime.set(hbTime.get()+end-start);
     		}
+            else{
+                System.threadSleep(SLEEP_TIME);
+            }
     	}
 
     }
@@ -106,13 +133,19 @@ public class StreamWrapper{
     		val mIN = inqueue.dequeue();
     		
     		if(mIN != null){
+                // val start = Timer.milliTime();
     			//Console.OUT.println("begin vertical Blur");
     			val m = ImageProcessing.verticalBlur(mIN.getImage(), blurAmmount);
     			val img = new ImageWrapper(mIN.getFilename(), m);
     			outqueue.enqueue(img);
-    			Console.OUT.println("vertical blurred a matrix");
+    			// Console.OUT.println("vertical blurred a matrix");
     			vbCounter.increment();
+                // val end = Timer.milliTime();
+                // vbTime.set(vbTime.get()+end-start);
     		}
+            else{
+                System.threadSleep(SLEEP_TIME);
+            }
     	}
 
     }
@@ -130,13 +163,19 @@ public class StreamWrapper{
     		val mIN = inqueue.dequeue();
     		
     		if(mIN != null){
+                // val start = Timer.milliTime();
     			//Console.OUT.println("begin filter");
     			val m = ImageProcessing.redFilter(mIN.getImage());
     			val img = new ImageWrapper(mIN.getFilename(), m);
     			outqueue.enqueue(img);
-    			Console.OUT.println("filtered a matrix");
+    			// Console.OUT.println("filtered a matrix");
     			filterCounter.increment();
+                // val end = Timer.milliTime();
+                // filterTime.set(filterTime.get()+end-start);
     		}
+            else{
+                System.threadSleep(SLEEP_TIME);
+            }
     	}
 
     }
@@ -154,16 +193,22 @@ public class StreamWrapper{
     		val mIN = inqueue.dequeue();
     		
     		if(mIN != null){
-    			Console.OUT.println("begin writing");
+                // val start = Timer.milliTime();
+    			// Console.OUT.println("begin writing");
 				ImageProcessing.matrixToFile(mIN.getImage(), mIN.getFilename());
-    			Console.OUT.println("wrote "+mIN.getFilename());
+    			// Console.OUT.println("wrote "+mIN.getFilename());
     			writerCounter.increment();
+                // val end = Timer.milliTime();
+                // writeTime.set(writeTime.get()+end-start);
     			// Console.OUT.println("readCounter is "+ readCounter.get());
     			// Console.OUT.println("hbCounter is "+ hbCounter.get());
     			// Console.OUT.println("vbCounter is "+ vbCounter.get());
     			// Console.OUT.println("filterCounter is "+ filterCounter.get());
     			// Console.OUT.println("writerCounter is "+ writerCounter.get());
     		}
+            else{
+                System.threadSleep(SLEEP_TIME);
+            }
     	}
 
     }
