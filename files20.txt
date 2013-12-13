@@ -14,11 +14,7 @@ simpsonsGirl.ppm
 simpsonsGirl2.ppm
 sample.ppm
 sample2.ppm
-sample3.ppm
-sample4.ppm
 sleep.ppm
 sleep2.ppm
 t&j.ppm
 t&j2.ppm
-t&j3.ppm
-t&j4.ppm
