@@ -1,9 +1,10 @@
 import x10.io.ReaderIterator;
 import x10.io.File;
 import x10.io.Printer;
-
+import x10.util.Random;
 //inspired by http://www.blackpawn.com/texts/blur/
 public class ImageProcessing{
+	public static val r: Random = new Random();
 	public static def readInMatrix(filename: String):Rail[Rail[Pixel]]{
 	    var F: File  = new File(filename);
 		var matrix: Rail[Rail[Pixel]];
@@ -143,7 +144,8 @@ public class ImageProcessing{
 		return outM;
 	}
 	public static def matrixToFile(m: Rail[Rail[Pixel]], fileName: String){
-        val F = new File("OUT"+fileName);
+		var number: Long = r.nextLong(1000);
+        val F = new File("OUT"+number+fileName);
         val printer = F.printer();
         printer.println("P3");
         printer.println(m(0).size+ " "+ m.size);
